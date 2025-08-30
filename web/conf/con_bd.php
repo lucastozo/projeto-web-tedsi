@@ -1,12 +1,12 @@
 <?php
-
 define("ENDERECO", "localhost");
 define("USUARIO", "root");
 define("SENHA", "root");
 define("BD_NOME", "pokemon-tedsi");
 define("PORTA", 3306);
 
-$con_bd;
+$con_bd = null;
+$con_bd_err_code = null;
 
 try {
     $con_bd = mysqli_connect(
@@ -17,8 +17,6 @@ try {
         PORTA
     );
 } catch (Exception $e) {
-    echo "Erro conectando ao banco de dados!"
-        . " <br>Código do erro: ".$e->getCode();
+    $con_bd_err_code = $e->getCode();
 }
-
 ?>

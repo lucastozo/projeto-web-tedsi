@@ -1,0 +1,3 @@
+Os seguintes itens devem ser instalados:
+php-mysql
+php-mbstring

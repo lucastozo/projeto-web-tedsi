@@ -12,6 +12,39 @@
 </style>
 
 <body>
-    
+    <div class="container">
+        <header class="header">
+            <h1>Cadastro de Pokémon</h1>
+        </header>
+        <nav class="col-nav">
+            <div>
+                <p>Início</p>
+                <a href="/">Ir ao início</a>
+            </div>
+            <div>
+                <p>Pokémon</p>
+                <a href="/pokemon/cadastrar.php">Cadastrar Pokémon</a>
+                <a href="/pokemon/listar.php">Listar Pokémons</a>
+            </div>
+            <div>
+                <p>Tipo</p>
+                <a href="/tipo/cadastrar.php">Cadastrar Tipo</a>
+                <a href="/tipo/listar.php">Listar Tipos</a>
+            </div>
+            <div>
+                <p>Habilidade</p>
+                <a href="/habilidade/cadastrar.php">Cadastrar Habilidade</a>
+                <a href="/habilidade/listar.php">Listar Habilidades</a>
+            </div>
+        </nav>
+        <div class="col-main">
+
+        </div>
+        <footer class="footer">
+            <h3>Trabalho desenvolvido para a disciplina de Tópicos Especiais em Desenvolvimento de Sistemas I</h3>
+            <strong>Grupo Miku Warriors</strong>
+            <span>Juliana Schorro Bach, Lucas Tozo Monção, Livia Elias Cardoso Verhalen</span>
+        </footer>
+    </div>
 </body>
 </html>
