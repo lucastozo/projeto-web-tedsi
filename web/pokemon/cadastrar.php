@@ -8,8 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $altura = $_POST['altura'];
     $peso = $_POST['peso'];
     $descricao = $_POST['descricao'];
-    $tipo1 = $_POST['tipo1'];
-    $tipo2 = $_POST['tipo2'];
+    $tipos = $_POST['tipos'];
     $habilidades = $_POST['habilidades'];
     
     // Logica para validar dados, restriçoes
@@ -18,10 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Peso: numero, 0 <= peso
     // Descricao: texto, maxlength 255
 
-    function validar($imagem, $nome, $altura, $peso, $descricao, $tipo1, $tipo2, $habilidades) : bool {
+    function validar($imagem, $nome, $altura, $peso, $descricao, $habilidades) : bool {
         if (
             !isset($imagem) || !isset($nome) || !isset($altura) || !isset($peso) || 
-            !isset($descricao) || !isset($tipo1) || !isset($tipo2) || !isset($habilidades)
+            !isset($descricao) || !isset($tipos) || !isset($habilidades)
             ) 
         {
             return false;
@@ -41,8 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (is_numeric($descricao)) return false;
         if (mb_strlen($descricao) > 255) return false;
 
-        if ($tipo1 === $tipo2) return false;
-
         return true;
     }
 }
@@ -59,6 +56,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <style>
     /* Pode escrever CSS específico para essa página aqui, ou usar um arquivo para estilo global  */ 
+    form {
+    padding: 20px;
+    max-width: 400px;
+    }
+
+    form, form div input, form div textarea {
+        border: 1px solid #aaa;
+    }
+
+    form div.campo {
+        margin-bottom: 12px;
+    }
+
+    form div input, form div textarea, form div select {
+        width: 100%;
+        padding: 6px;
+        box-sizing: border-box;
+        resize: none;
+    }
+
+    form div button {
+        padding: 15px;
+        cursor: pointer;
+    }
+
+    .msg-sucesso {
+        background: #d4edda;
+        color: #155724;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #c3e6cb;
+        border-radius: 5px;
+    }
+
+    .msg-erro {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #f5c6cb;
+        border-radius: 5px;
+    }
 </style>
 
 <body>
@@ -84,55 +123,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="descricao">Descrição:</label> <br> <!-- quebra linha -->
             <textarea id="descricao" name="descricao" required maxlength="255" rows="5" cols="30" placeholder="The flame on its tail shows the strength of its life-force. If Charmander is weak, the flame also burns weakly."></textarea>
         </div>
-        <div id="div_tipo1" class="campo">
-            <label for="tipo1">Tipo 1:</label>
-            <select id="tipo1" name="tipo1" required>
-                <option value="bug">Bug</option>
-                <option value="dragao">Dragão</option>
-                <option value="fada">Fada</option>
-                <option value="fogo">Fogo</option>
-                <option value="ghost">Ghost</option>
-                <option value="ground">Ground</option>
-                <option value="normal">Normal</option>
-                <option value="psiquico">Psíquico</option>
-                <option value="steel">Steel</option>
-                <option value="dark">Dark</option>
-                <option value="electric">Electric</option>
-                <option value="luta">Luta</option>
-                <option value="flying">Flying</option>
-                <option value="planta">Planta</option>
-                <option value="ice">Ice</option>
-                <option value="poison">Poison</option>
-                <option value="rock">Rock</option>
-                <option value="agua">Água</option>
+        <div id="div_tipos" class="campo">
+            <label for="tipos">Tipos:</label>
+            <select id="tipos" name="tipos[]" required multiple>
+                <?php
+                require_once("../conf/con_bd.php");
+                if (isset($con_bd)) {
+                    $sql = "SELECT id, nome FROM tipo";
+                    $result = mysqli_query($con_bd, $sql);
+                    $tipos = mysqli_fetch_assoc($result);
+                    do {
+                        echo "<option value='{$tipos['id']}'>{$tipos['tipo']}</option>";
+                    } while ($tipos !== null);
+                }
+                ?>
             </select>
         </div>
-        <div id="div_tipo2" class="campo">
-            <label for="tipo2">Tipo 2 (Se aplicável):</label>
-            <select id="tipo2" name="tipo2" required>
-                <optgroup label="Não aplicável">
-                    <option value="na">N/A</option>
-                </optgroup>
-                    <optgroup label="Aplicável">
-                    <option value="bug">Bug</option>
-                    <option value="dragao">Dragão</option>
-                    <option value="fada">Fada</option>
-                    <option value="fogo">Fogo</option>
-                    <option value="ghost">Ghost</option>
-                    <option value="ground">Ground</option>
-                    <option value="normal">Normal</option>
-                    <option value="psiquico">Psíquico</option>
-                    <option value="steel">Steel</option>
-                    <option value="dark">Dark</option>
-                    <option value="electric">Electric</option>
-                    <option value="luta">Luta</option>
-                    <option value="flying">Flying</option>
-                    <option value="planta">Planta</option>
-                    <option value="ice">Ice</option>
-                    <option value="poison">Poison</option>
-                    <option value="rock">Rock</option>
-                    <option value="agua">Água</option>
-                </optgroup>
+        <div id="div_habilidades" class="campo">
+            <label for="habilidades">Habilidades:</label>
+            <select id="habilidades" name="habilidades[]" required multiple>
+                <?php
+                require_once("../conf/con_bd.php");
+                if (isset($con_bd)) {
+                    $sql = "SELECT id, nome FROM habilidade";
+                    $result = mysqli_query($con_bd, $sql);
+                    $habilidades = mysqli_fetch_assoc($result);
+                    do {
+                        echo "<option value='{$habilidades['id']}'>{$habilidades['nome']}</option>";
+                    } while ($habilidades !== null);
+                }
+                ?>
             </select>
         </div>
         <div id="div_enviar">

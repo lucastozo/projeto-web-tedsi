@@ -6,7 +6,7 @@ define("SENHA", "root");
 define("BD_NOME", "pokemon-tedsi");
 define("PORTA", 3306);
 
-$con_bd = false;
+$con_bd;
 
 try {
     $con_bd = mysqli_connect(
