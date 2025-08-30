@@ -1,1 +1,43 @@
 /* Estilos globais (para todas as páginas) */
+form {
+    padding: 20px;
+    max-width: 400px;
+}
+
+form, form div input, form div textarea {
+    border: 1px solid #aaa;
+}
+
+form div.campo {
+    margin-bottom: 12px;
+}
+
+form div input, form div textarea, form div select {
+    width: 100%;
+    padding: 6px;
+    box-sizing: border-box;
+    resize: none;
+}
+
+form div button {
+    padding: 15px;
+    cursor: pointer;
+}
+
+.msg-sucesso {
+    background: #d4edda;
+    color: #155724;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+}
+
+.msg-erro {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+}
