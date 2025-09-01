@@ -65,15 +65,15 @@ UPDATE tipo SET nome = p_nv_tipo WHERE nome = p_ant_tipo;
 END //
 
 CREATE PROCEDURE deletar_tipo(
-IN p_dlt_tipo VARCHAR(30)
+IN p_dlt_tipo INT
 )
 BEGIN
 DECLARE cnt_tipo INT;
-SELECT COUNT(*) INTO cnt_tipo FROM tipo WHERE nome = p_dlt_tipo;
+SELECT COUNT(*) INTO cnt_tipo FROM tipo WHERE id = p_dlt_tipo;
 IF cnt_tipo = 0 THEN
-SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Esse tipo não foi cadastrado.';
+SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Esse ID não existe.';
 END IF;
-DELETE FROM tipo WHERE nome = p_dlt_tipo;
+DELETE FROM tipo WHERE id = p_dlt_tipo;
 END //
 
 CREATE PROCEDURE listar_tipo()
@@ -116,13 +116,23 @@ UPDATE habilidade SET nome = p_nv_nome, descricao = p_nv_descricao WHERE nome = 
 END //
 
 CREATE PROCEDURE deletar_habilidade(
-IN p_dlt_habilidade VARCHAR(30)
+IN p_dlt_habilidade INT
 )
 BEGIN
 DECLARE cnt_habilidade INT;
-SELECT COUNT(*) INTO cnt_habilidade FROM habilidade WHERE nome = p_dlt_habilidade;
+SELECT COUNT(*) INTO cnt_habilidade FROM habilidade WHERE id  = p_dlt_habilidade;
 IF cnt_habilidade = 0 THEN
-SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Habilidade não cadastrada.';
+SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Esse ID não foi encontrado.';
 END IF;
-DELETE FROM habilidade WHERE nome = p_dlt_habilidade;
+DELETE FROM habilidade WHERE id = p_dlt_habilidade;
 END //
+
+DELIMITER ;
+--Caso necessario
+DROP PROCEDURE novo_tipo;
+DROP PROCEDURE atualizar_tipo;
+DROP PROCEDURE deletar_tipo;
+
+DROP PROCEDURE nova_habilidade;
+DROP PROCEDURE atualizar_habilidade;
+DROP PROCEDURE deletar_habilidade;
