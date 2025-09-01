@@ -1,0 +1,30 @@
+CREATE TABLE IF NOT EXISTS pokemon(
+id INTEGER AUTO_INCREMENT PRIMARY KEY,
+imagem VARCHAR(255),
+nome VARCHAR(20),
+altura FLOAT(4,1),
+peso FLOAT(5,2),
+descricao TEXT);
+
+CREATE TABLE IF NOT EXISTS habilidades(
+id INTEGER AUTO_INCREMENT PRIMARY KEY,
+nome VARCHAR(20),
+descricao TEXT);
+
+CREATE TABLE IF NOT EXISTS tipos(
+id INTEGER AUTO_INCREMENT PRIMARY KEY,
+tipo VARCHAR(20));
+
+CREATE TABLE IF NOT EXISTS tem_habilidades(
+id INTEGER AUTO_INCREMENT PRIMARY KEY,
+id_habilidades INTEGER,
+id_pokemon INTEGER,
+FOREIGN KEY (id_habilidades) REFERENCES habilidades(id),
+FOREIGN KEY (id_pokemon) REFERENCES pokemon(id));
+
+CREATE TABLE IF NOT EXISTS tem_tipo(
+id INTEGER AUTO_INCREMENT PRIMARY KEY,
+id_tipo INTEGER,
+id_pokemon INTEGER,
+FOREIGN KEY (id_tipo) REFERENCES tipos(id),
+FOREIGN KEY (id_pokemon) REFERENCES pokemon(id));
