@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($con_bd) && validar($nome))
     {
         $nome = mysqli_real_escape_string($con_bd, $nome);
-        $sql = ""; // todo: ajustar depois
+        $sql = "INSERT INTO tipo (nome) values ('$nome');"; // todo: ajustar depois
         $result = mysqli_query($con_bd, $sql);
         if ($result)
         {

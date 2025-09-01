@@ -141,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 $result = mysqli_query($con_bd, $sql);
                                 $tipos = mysqli_fetch_assoc($result);
                                 do {
-                                    echo "<option value='{$tipos['id']}'>{$tipos['tipo']}</option>";
+                                    echo "<option value='{$tipos['id']}'>{$tipos['nome']}</option>";
                                 } while ($tipos !== null);
                             }
                             ?>
