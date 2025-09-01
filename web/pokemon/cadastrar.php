@@ -10,10 +10,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tipos = $_POST['tipos'];
     $habilidades = $_POST['habilidades'];
 
-    function validar($imagem, $nome, $altura, $peso, $descricao) : bool {
+    function validar($imagem, $nome, $altura, $peso, $descricao, $tipos, $habilidades) : bool {
         if (
             !isset($imagem) || !isset($nome) || !isset($altura) || !isset($peso) || 
-            !isset($descricao)
+            !isset($descricao) || !isset($tipos) || !isset($habilidades)
             ) 
         {
             return false;
@@ -33,32 +33,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (is_numeric($descricao)) return false;
         if (mb_strlen($descricao) > 255) return false;
 
+        if (count($tipos) > 2) return false;
+        if (count($habilidades) > 2) return false;
+
         return true;
     }
 
     require_once("../conf/con_bd.php");
-    if (isset($con_bd) && validar($imagem, $nome, $altura, $peso, $descricao))
-    {
+    $dados_validos = validar($imagem, $nome, $altura, $peso, $descricao, $tipos, $habilidades);
+
+    try {
+        if (!$dados_validos) {
+            throw new Exception("Dados preenchidos inválidos.");
+        }
+
+        if (!isset($con_bd)) {
+            throw new Exception("Conexão com o banco de dados falhou.");
+        }
+
         $imagem = mysqli_real_escape_string($con_bd, $imagem);
         $nome = mysqli_real_escape_string($con_bd, $nome);
         $altura = mysqli_real_escape_string($con_bd, $altura);
         $peso = mysqli_real_escape_string($con_bd, $peso);
         $descricao = mysqli_real_escape_string($con_bd, $descricao);
+
         $sql = ""; // todo: ajustar depois
         $result = mysqli_query($con_bd, $sql);
-        if ($result)
-        {
-            $_SESSION['flash_msg'] = "Dados cadastrados com sucesso.";
-            $_SESSION['flash_status'] = 0;
+        
+        if (!$result) {
+            throw new Exception("Falha ao cadastrar dados: " . mysqli_error($con_bd));
         }
-        else
-        {
-            $_SESSION['flash_msg'] = "Falha ao cadastrar dados.";
-            $_SESSION['flash_status'] = -1;
-        }
+
+        $_SESSION['flash_msg'] = "Dados cadastrados com sucesso.";
+        $_SESSION['flash_status'] = 0;
+    } catch (Exception $e) {
+        $_SESSION['flash_msg'] = $e->getMessage();
+        $_SESSION['flash_status'] = -1;
     }
-    if (isset($con_bd_err_code))
-    {
+
+    if (isset($con_bd_err_code)) {
         $_SESSION['flash_msg'] = "Erro com o banco de dados. Código: " . $con_bd_err_code;
         $_SESSION['flash_status'] = -1;
     }
@@ -139,10 +152,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             if (isset($con_bd)) {
                                 $sql = "SELECT id, nome FROM tipo";
                                 $result = mysqli_query($con_bd, $sql);
-                                $tipos = mysqli_fetch_assoc($result);
-                                do {
+                                while ($tipos = mysqli_fetch_assoc($result)) {
                                     echo "<option value='{$tipos['id']}'>{$tipos['nome']}</option>";
-                                } while ($tipos !== null);
+                                }
                             }
                             ?>
                         </select>
@@ -155,10 +167,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             if (isset($con_bd)) {
                                 $sql = "SELECT id, nome FROM habilidade";
                                 $result = mysqli_query($con_bd, $sql);
-                                $habilidades = mysqli_fetch_assoc($result);
-                                do {
+                                while ($habilidades = mysqli_fetch_assoc($result)) {
                                     echo "<option value='{$habilidades['id']}'>{$habilidades['nome']}</option>";
-                                } while ($habilidades !== null);
+                                }
                             }
                             ?>
                         </select>

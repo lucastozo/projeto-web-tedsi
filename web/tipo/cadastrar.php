@@ -17,24 +17,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     require_once("../conf/con_bd.php");
-    if (isset($con_bd) && validar($nome))
-    {
+    $dados_validos = validar($nome);
+    try {
+        if (!$dados_validos) {
+            throw new Exception("Dados preenchidos inválidos.");
+        }
+        
+        if (!isset($con_bd)) {
+            throw new Exception("Conexão com o banco de dados falhou.");
+        }
+        
         $nome = mysqli_real_escape_string($con_bd, $nome);
-        $sql = "INSERT INTO tipo (nome) values ('$nome');"; // todo: ajustar depois
+        $sql = "CALL novo_tipo('$nome');";
         $result = mysqli_query($con_bd, $sql);
-        if ($result)
-        {
-            $_SESSION['flash_msg'] = "Dados cadastrados com sucesso.";
-            $_SESSION['flash_status'] = 0;
+        
+        if (!$result) {
+            throw new Exception("Falha ao cadastrar dados: " . mysqli_error($con_bd));
         }
-        else
-        {
-            $_SESSION['flash_msg'] = "Falha ao cadastrar dados.";
-            $_SESSION['flash_status'] = -1;
-        }
+        
+        $_SESSION['flash_msg'] = "Dados cadastrados com sucesso.";
+        $_SESSION['flash_status'] = 0;
+        
+    } catch (Exception $e) {
+        $_SESSION['flash_msg'] = $e->getMessage();
+        $_SESSION['flash_status'] = -1;
     }
-    if (isset($con_bd_err_code))
-    {
+
+    if (isset($con_bd_err_code)) {
         $_SESSION['flash_msg'] = "Erro com o banco de dados. Código: " . $con_bd_err_code;
         $_SESSION['flash_status'] = -1;
     }

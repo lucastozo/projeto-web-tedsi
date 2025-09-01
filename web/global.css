@@ -9,8 +9,8 @@ div.container {
     display: grid;
     grid-template-columns: 250px auto;
     grid-template-rows: 120px auto 120px;
-    min-width: 1080px;
-    min-height: 900px;
+    min-width: 1080px; /* obrigatorio, nao mexer */
+    min-height: 900px; /* obrigatorio, nao mexer */
 }
 
 div.container header, div.container nav.col-nav, div.container nav.col-nav div, div.container footer {
