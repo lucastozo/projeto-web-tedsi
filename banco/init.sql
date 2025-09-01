@@ -28,3 +28,18 @@ id_tipo INTEGER,
 id_pokemon INTEGER,
 FOREIGN KEY (id_tipo) REFERENCES tipos(id),
 FOREIGN KEY (id_pokemon) REFERENCES pokemon(id));
+
+DELIMITER //
+CREATE PROCEDURE novo_tipo(
+IN p_nv_tipo VARCHAR(20)
+)
+BEGIN
+DECLARE cnt_tipo INT;
+SELECT COUNT(*) INTO cnt_tipo FROM tipos WHERE tipo=p_nv_tipo;
+IF cnt_tipo > 0 THEN
+SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Já existe esse tipo cadastrado';
+END IF;
+INSERT INTO tipos(tipo) VALUES (p_nv_tipo);
+END //
+
+DELIMITER ;
