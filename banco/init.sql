@@ -47,21 +47,21 @@ INSERT INTO tipo(nome) VALUES (p_nv_tipo);
 END //
 
 CREATE PROCEDURE atualizar_tipo(
-	IN p_ant_tipo VARCHAR(30),
-    IN p_nv_tipo VARCHAR(30)
+IN p_id INT,
+IN p_nv_tipo VARCHAR(30)
 )
 BEGIN
 DECLARE cnt_tipo INT;
-SELECT COUNT(*) INTO cnt_tipo FROM tipo WHERE nome = p_ant_tipo;
+SELECT COUNT(*) INTO cnt_tipo FROM tipo WHERE id = p_id;
 IF cnt_tipo = 0 THEN
-SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Esse tipo não foi cadastrado.';
+SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Esse id não foi existe.';
 END IF;
 SET @cnt_tipo := 0;
-SELECT COUNT(*) INTO cnt_tipo FROM tipo WHERE nome = p_nv_tipo;
+SELECT COUNT(*) INTO cnt_tipo FROM tipo WHERE nome = p_nv_tipo AND id != p_id;
 IF cnt_tipo > 0 THEN
 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Esse tipo já está cadastrado.';
 END IF;
-UPDATE tipo SET nome = p_nv_tipo WHERE nome = p_ant_tipo;
+UPDATE tipo SET nome = p_nv_tipo WHERE id = p_id;
 END //
 
 CREATE PROCEDURE deletar_tipo(
@@ -97,22 +97,22 @@ INSERT INTO habilidade(nome, descricao) VALUES (p_nv_nome, p_nv_descricao);
 END //
 
 CREATE PROCEDURE atualizar_habilidade(
-IN p_ant_nome VARCHAR(30),
+IN p_id INT,
 IN p_nv_nome VARCHAR(30),
 IN p_nv_descricao VARCHAR(255)
 )
 BEGIN
 DECLARE cnt_habilidade INT;
-SELECT COUNT(*) INTO cnt_habilidade FROM habilidade WHERE nome = p_ant_nome;
+SELECT COUNT(*) INTO cnt_habilidade FROM habilidade WHERE id = p_id;
 IF cnt_habilidade = 0 THEN
-SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Não existe uma habilidade com esse nome.';
+SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Não existe uma habilidade com esse id.';
 END IF;
 SET @cnt_habilidade := 0;
-SELECT COUNT(*) INTO cnt_habilidade FROM habilidade WHERE nome = p_nv_nome;
-IF cnt_habilidade > 0 AND p_nv_nome != p_ant_nome THEN
+SELECT COUNT(*) INTO cnt_habilidade FROM habilidade WHERE nome = p_nv_nome AND id != p_id;
+IF cnt_habilidade > 0 THEN
 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Já existe uma habilidade com esse nome.';
 END IF;
-UPDATE habilidade SET nome = p_nv_nome, descricao = p_nv_descricao WHERE nome = p_ant_nome;
+UPDATE habilidade SET nome = p_nv_nome, descricao = p_nv_descricao WHERE id = p_id;
 END //
 
 CREATE PROCEDURE deletar_habilidade(
