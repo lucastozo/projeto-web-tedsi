@@ -1,14 +1,35 @@
 <?php declare(strict_types=1);
 session_start();
+require_once("../utils/mensagem.php");
+
+$eh_edicao = isset($_GET['id']) && !empty($_GET['id']);
+$id_tipo = $eh_edicao ? (int)$_GET['id'] : null;
+$tipo_atual = null;
+
+if ($eh_edicao) {
+    require_once("../conf/con_bd.php");
+    
+    if (isset($con_bd)) {
+        $sql = "SELECT * FROM tipo WHERE id = $id_tipo";
+        $result = mysqli_query($con_bd, $sql);
+        
+        if ($result && mysqli_num_rows($result) > 0) {
+            $tipo_atual = mysqli_fetch_assoc($result);
+        } else {
+            $_SESSION['flash_msg'] = "Tipo não encontrado.";
+            $_SESSION['flash_status'] = -1;
+            header("Location: listar.php");
+            exit;
+        }
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = $_POST['nome'];
+    $id_para_atualizar = isset($_POST['id']) ? (int)$_POST['id'] : null;
 
     function validar($nome) : bool {
-        if (!isset($nome)) 
-        {
-            return false;
-        }
+        if (!isset($nome)) return false;
 
         if (is_numeric($nome)) return false;
         if (mb_strlen($nome) > 30) return false;
@@ -18,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     require_once("../conf/con_bd.php");
     $dados_validos = validar($nome);
+    
     try {
         if (!$dados_validos) {
             throw new Exception("Dados preenchidos inválidos.");
@@ -28,14 +50,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         $nome = mysqli_real_escape_string($con_bd, $nome);
-        $sql = "CALL novo_tipo('$nome');";
+        
+        if ($id_para_atualizar) {
+            $sql = "CALL atualizar_tipo($id_para_atualizar, '$nome');";
+            $success_msg = "Tipo atualizado com sucesso.";
+        } else {
+            $sql = "CALL novo_tipo('$nome');";
+            $success_msg = "Tipo cadastrado com sucesso.";
+        }
+        
         $result = mysqli_query($con_bd, $sql);
         
         if (!$result) {
-            throw new Exception("Falha ao cadastrar dados: " . mysqli_error($con_bd));
+            throw new Exception("Falha ao " . ($id_para_atualizar ? "atualizar" : "cadastrar") . " dados: " . mysqli_error($con_bd));
         }
         
-        $_SESSION['flash_msg'] = "Dados cadastrados com sucesso.";
+        $_SESSION['flash_msg'] = $success_msg;
         $_SESSION['flash_status'] = 0;
         
     } catch (Exception $e) {
@@ -48,7 +78,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['flash_status'] = -1;
     }
 
-    header("Location: " . $_SERVER['PHP_SELF']);
+
+    if ($id_para_atualizar) {
+        header("Location: listar.php");
+    } else {
+        header("Location: " . $_SERVER['PHP_SELF']);
+    }
     exit;
 }
 ?>
@@ -58,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastrar Tipo</title>
+    <title><?php echo $eh_edicao ? 'Atualizar' : 'Cadastrar'; ?> Tipo</title>
     <link rel="stylesheet" href="/global.css"/>
 </head>
 
@@ -94,23 +129,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </nav>
         <div class="col-main">
             <div class="form">
-                <h1>Cadastrar Tipo</h1>
+                <h1><?php echo $eh_edicao ? 'Atualizar' : 'Cadastrar'; ?> Tipo</h1>
+                
                 <form action="" method="POST">
+                    <?php if ($eh_edicao): ?>
+                        <input type="hidden" name="id" value="<?php echo $id_tipo; ?>">
+                    <?php endif; ?>
+                    
                     <div id="div_nome" class="campo">
                         <label for="nome">Nome:</label>
-                        <input type="text" id="nome" name="nome" maxlength="30" required pattern="[a-zA-Z]*" placeholder="Planta"/>
+                        <input 
+                            type="text" 
+                            id="nome" 
+                            name="nome" 
+                            maxlength="30" 
+                            required 
+                            pattern="[a-zA-Z]*" 
+                            placeholder="Planta"
+                            value="<?php echo $tipo_atual ? htmlspecialchars($tipo_atual['nome']) : ''; ?>"
+                        />
                     </div>
                     <div id="div_enviar">
-                        <button type="submit">Cadastrar</button>
+                        <button type="submit">
+                            <?php echo $eh_edicao ? 'Atualizar' : 'Cadastrar'; ?>
+                        </button>
+                        <?php if ($eh_edicao): ?>
+                            <a href="listar.php">Cancelar</a>
+                        <?php endif; ?>
                     </div>
-                    <?php if (isset($_SESSION['flash_msg'])): ?>
-                        <div class="msg <?= $_SESSION['flash_status'] === 0 ? 'sucesso' : 'erro' ?>">
-                            <?= htmlspecialchars($_SESSION['flash_msg']) ?>
-                        </div>
-                        <?php 
-                            unset($_SESSION['flash_msg'], $_SESSION['flash_status']); 
-                        ?>
-                    <?php endif; ?>
+                    <?php 
+                        exibir_mensagem();
+                    ?>
                 </form>
             </div>
         </div>
