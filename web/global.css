@@ -64,7 +64,7 @@ div.container div.col-main {
     align-items: center;
 }
 
-div.container div.col-main div.form {
+div.container div.col-main div.form, div.container div.col-main div.card {
     background-color: rgb(245, 245, 245);
     border-radius: 5px;
     padding: 50px;
@@ -139,4 +139,40 @@ table th, table td {
     padding: 12px 15px;
     border: 1px solid black;
     text-align: left;
+}
+
+table tr:nth-child(even){background-color: #f2f2f2;}
+
+table tr:hover {background-color: #ddd;}
+
+table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #464646;
+  color: white;
+}
+
+.btn {
+    background-color: #555555;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    padding: 15px 30px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+}
+
+.btn.info {
+    background-color: #008CBA;
+}
+
+.btn.deletar {
+    background-color: #f44336;
+}
+
+.btn.atualizar, .btn.cadastrar {
+    background-color: #04AA6D;
 }

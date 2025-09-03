@@ -175,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </select>
                     </div>
                     <div id="div_enviar">
-                        <button type="submit">Cadastrar</button>
+                        <button class="btn cadastrar" type="submit">Cadastrar</button>
                     </div>
                     <?php if (isset($_SESSION['flash_msg'])): ?>
                         <div class="msg <?= $_SESSION['flash_status'] === 0 ? 'sucesso' : 'erro' ?>">

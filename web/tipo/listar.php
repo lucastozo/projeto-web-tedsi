@@ -75,11 +75,11 @@ require_once("../utils/mensagem.php");
                                     echo "</tr>";
                                 }
                             } 
-                            else echo "<tr><td colspan='3' class='msg erro'>Nenhum tipo encontrado</td></tr>";
+                            else echo "<tr><td colspan='3' class='msg erro'>Nenhum tipo encontrado.</td></tr>";
                         } 
                         else echo "<tr><td colspan='3' class='msg erro'>Erro ao buscar tipos: " . mysqli_error($con_bd) . "</td></tr>";
                     } 
-                    else echo "<tr><td colspan='3' class='msg erro'>Erro de conexão com o banco de dados</td></tr>";
+                    else echo "<tr><td colspan='3' class='msg erro'>Erro de conexão com o banco de dados.</td></tr>";
                     ?>
                 </tr>
             </table>

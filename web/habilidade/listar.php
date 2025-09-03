@@ -77,11 +77,11 @@ require_once("../utils/mensagem.php");
                                     echo "</tr>";
                                 }
                             } 
-                            else echo "<tr><td colspan='3' class='msg erro'>Nenhuma habilidade encontrada</td></tr>";
+                            else echo "<tr><td colspan='4' class='msg erro'>Nenhuma habilidade encontrada.</td></tr>";
                         } 
-                        else echo "<tr><td colspan='3' class='msg erro'>Erro ao buscar habilidades: " . mysqli_error($con_bd) . "</td></tr>";
+                        else echo "<tr><td colspan='4' class='msg erro'>Erro ao buscar habilidades: " . mysqli_error($con_bd) . "</td></tr>";
                     } 
-                    else echo "<tr><td colspan='3' class='msg erro'>Erro de conexão com o banco de dados</td></tr>";
+                    else echo "<tr><td colspan='4' class='msg erro'>Erro de conexão com o banco de dados.</td></tr>";
                     ?>
                 </tr>
             </table>

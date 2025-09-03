@@ -106,22 +106,25 @@ function deletar() {
         </nav>
         <div class="col-main">
             <?php if ($id !== null && $nome !== null): ?>
-                <div>
+                <div class="card">
                     <h1>Detalhes do Tipo</h1>
                     <div>
                         <p><strong>ID:</strong> <?= htmlspecialchars($id) ?></p>
                         <p><strong>Nome:</strong> <?= htmlspecialchars($nome) ?></p>
                     </div>
                     <div>
-                        <a href="listar.php">Voltar para a lista</a>
-                        <a href="visualizar.php?id=<?=$id?>&delete">Excluir</a>
-                        <a href="cadastrar.php?id=<?=$id?>">Atualizar</a>
+                        <a class="btn" href="listar.php">Voltar</a>
+                        <a class="btn deletar" href="visualizar.php?id=<?=$id?>&delete">Excluir</a>
+                        <a class="btn atualizar" href="cadastrar.php?id=<?=$id?>">Atualizar</a>
                     </div>
                 </div>
             <?php else: ?>
                 <div>
-                    <p>Tipo não encontrado ou ID inválido.</p>
-                    <a href="listar.php">Voltar para a lista</a>
+                    <?php
+                        definir_mensagem("Habilidade não encontrada ou ID inválido.", -1);
+                        exibir_mensagem();
+                    ?>
+                    <a class="btn" href="listar.php">Voltar</a>
                 </div>
             <?php endif; ?>
         </div>

@@ -146,11 +146,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         />
                     </div>
                     <div id="div_enviar">
-                        <button type="submit">
+                        <button class="btn cadastrar" type="submit">
                             <?php echo $eh_edicao ? 'Atualizar' : 'Cadastrar'; ?>
                         </button>
                         <?php if ($eh_edicao): ?>
-                            <a href="listar.php">Cancelar</a>
+                            <a class="btn" href="listar.php">Cancelar</a>
                         <?php endif; ?>
                     </div>
                     <?php 
