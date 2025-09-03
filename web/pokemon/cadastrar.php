@@ -1,5 +1,27 @@
 <?php declare(strict_types=1);
 session_start();
+require_once("../utils/mensagem.php");
+
+$eh_edicao = isset($_GET['id']) && !empty($_GET['id']);
+$id_pokemon = $eh_edicao ? (int)$_GET['id'] : null;
+$pokemon_atual = null;
+
+if ($eh_edicao) {
+    require_once("../conf/con_bd.php");
+    
+    if (isset($con_bd)) {
+        $sql = "SELECT * FROM VIEW QUE SERÁ FEITA AINDA WHERE id = $id_pokemon";
+        $result = mysqli_query($con_bd, $sql);
+        
+        if ($result && mysqli_num_rows($result) > 0) {
+            $pokemon_atual = mysqli_fetch_assoc($result);
+        } else {
+            definir_mensagem("Pokémon não encontrado.", -1);
+            header("Location: listar.php");
+            exit;
+        }
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $imagem = $_POST['imagem'];
@@ -9,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $descricao = $_POST['descricao'];
     $tipos = $_POST['tipos'];
     $habilidades = $_POST['habilidades'];
+    $id_para_atualizar = isset($_POST['id']) ? (int)$_POST['id'] : null;
 
     function validar($imagem, $nome, $altura, $peso, $descricao, $tipos, $habilidades) : bool {
         if (
@@ -56,27 +79,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $altura = mysqli_real_escape_string($con_bd, $altura);
         $peso = mysqli_real_escape_string($con_bd, $peso);
         $descricao = mysqli_real_escape_string($con_bd, $descricao);
+        $tipos = json_encode($tipos, JSON_UNESCAPED_UNICODE);
+        $habilidades = json_encode($habilidades, JSON_UNESCAPED_UNICODE);
 
-        $sql = ""; // todo: ajustar depois
-        $result = mysqli_query($con_bd, $sql);
-        
-        if (!$result) {
-            throw new Exception("Falha ao cadastrar dados: " . mysqli_error($con_bd));
+        if ($id_para_atualizar) {
+            $sql = "CALL atualizar_pokemon($id_para_atualizar, '$imagem', '$nome', $altura, $peso, '$descricao', '$tipos', '$habilidades');";
+            $success_msg = "Pokémon atualizado com sucesso.";
+        } else {
+            $sql = "CALL novo_pokemon('$imagem', '$nome', $altura, $peso, '$descricao', '$tipos', '$habilidades');";
+            $success_msg = "Pokémon cadastrado com sucesso.";
         }
 
-        $_SESSION['flash_msg'] = "Dados cadastrados com sucesso.";
-        $_SESSION['flash_status'] = 0;
+        $result = mysqli_query($con_bd, $sql);
+
+        if (!$result) {
+            throw new Exception("Falha ao " . ($id_para_atualizar ? "atualizar" : "cadastrar") . " dados: " . mysqli_error($con_bd));
+        }
+
+        definir_mensagem($success_msg);
     } catch (Exception $e) {
-        $_SESSION['flash_msg'] = $e->getMessage();
-        $_SESSION['flash_status'] = -1;
+        definir_mensagem($e->getMessage(), -1);
     }
 
     if (isset($con_bd_err_code)) {
-        $_SESSION['flash_msg'] = "Erro com o banco de dados. Código: " . $con_bd_err_code;
-        $_SESSION['flash_status'] = -1;
+        definir_mensagem("Erro com o banco de dados. Código: " . $con_bd_err_code, -1);
     }
 
-    header("Location: " . $_SERVER['PHP_SELF']);
+    if ($id_para_atualizar) {
+        header("Location: listar.php");
+    } else {
+        header("Location: " . $_SERVER['PHP_SELF']);
+    }
     exit;
 }
 ?>
@@ -122,30 +155,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </nav>
         <div class="col-main">
             <div class="form">
-                <h1>Cadastrar Pokémon</h1>
+                <h1><?php echo $eh_edicao ? 'Atualizar' : 'Cadastrar'; ?> Pokémon</h1>
+
                 <form action="" method="POST">
+                    <?php if ($eh_edicao): ?>
+                        <input type="hidden" name="id" value="<?php echo $id_pokemon; ?>">
+                    <?php endif; ?>
+
                     <div id="div_imagem" class="campo">
                         <label for="imagem">Imagem:</label>
-                        <input type="file" id="imagem" name="imagem" required accept=".png,.jpg,.jpeg"/>
+                        <input 
+                            type="file" 
+                            id="imagem" 
+                            name="imagem" 
+                            required 
+                            accept=".png,.jpg,.jpeg"
+                            value="<?php echo $pokemon_atual ? htmlspecialchars($pokemon_atual['imagem']) : ''; ?>"
+                        />
                     </div>
                     <div id="div_nome" class="campo">
                         <label for="nome">Nome:</label>
-                        <input type="text" id="nome" name="nome" maxlength="50" required pattern="[a-zA-Z]*" placeholder="Charmander"/>
+                        <input 
+                            type="text" 
+                            id="nome" 
+                            name="nome" 
+                            maxlength="50" 
+                            required 
+                            pattern="[a-zA-Z]*" 
+                            placeholder="Charmander"
+                            value="<?php echo $pokemon_atual ? htmlspecialchars($pokemon_atual['nome']) : ''; ?>"
+                        />
                     </div>
                     <div id="div_altura" class="campo">
                         <label for="altura">Altura (m):</label>
-                        <input type="number" id="altura" name="altura" required min="0" max="10" step="0.01" placeholder="0.6"/>
+                        <input 
+                            type="number" 
+                            id="altura" 
+                            name="altura" 
+                            required min="0" 
+                            max="10" 
+                            step="0.01" 
+                            placeholder="0.6"
+                            value="<?php echo $pokemon_atual ? htmlspecialchars($pokemon_atual['altura']) : ''; ?>"
+                        />
                     </div>
                     <div id="div_peso" class="campo">
                         <label for="peso">Peso (kg):</label>
-                        <input type="number" id="peso" name="peso" required step="0.01" min="0" placeholder="8.5"/>
+                        <input 
+                            type="number" 
+                            id="peso" 
+                            name="peso" 
+                            required 
+                            step="0.01" 
+                            min="0" 
+                            placeholder="8.5"
+                            value="<?php echo $pokemon_atual ? htmlspecialchars($pokemon_atual['peso']) : ''; ?>"
+                        />
                     </div>
                     <div id="div_descricao" class="campo">
                         <label for="descricao">Descrição:</label> <br> <!-- quebra linha -->
-                        <textarea id="descricao" name="descricao" required maxlength="255" rows="5" cols="30" placeholder="The flame on its tail shows the strength of its life-force. If Charmander is weak, the flame also burns weakly."></textarea>
+                        <textarea 
+                            id="descricao" 
+                            name="descricao" 
+                            required 
+                            maxlength="255" 
+                            rows="5" 
+                            cols="30" 
+                            placeholder="The flame on its tail shows the strength of its life-force. If Charmander is weak, the flame also burns weakly."
+                            ><?php echo $pokemon_atual ? htmlspecialchars($pokemon_atual['descricao']) : ''; ?></textarea>
                     </div>
                     <div id="div_tipos" class="campo">
-                        <label for="tipos">Tipos:</label>
+                        <label for="tipos">Tipos: (máx. 2)</label>
                         <select id="tipos" name="tipos[]" required multiple>
                             <?php
                             require_once("../conf/con_bd.php");
@@ -160,7 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </select>
                     </div>
                     <div id="div_habilidades" class="campo">
-                        <label for="habilidades">Habilidades:</label>
+                        <label for="habilidades">Habilidades: (máx. 2)</label>
                         <select id="habilidades" name="habilidades[]" required multiple>
                             <?php
                             require_once("../conf/con_bd.php");
@@ -175,16 +255,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </select>
                     </div>
                     <div id="div_enviar">
-                        <button class="btn cadastrar" type="submit">Cadastrar</button>
+                        <button class="btn cadastrar" type="submit">
+                            <?php echo $eh_edicao ? 'Atualizar' : 'Cadastrar'; ?>
+                        </button>
+                        <?php if ($eh_edicao): ?>
+                            <a class="btn" href="listar.php">Cancelar</a>
+                        <?php endif; ?>
                     </div>
-                    <?php if (isset($_SESSION['flash_msg'])): ?>
-                        <div class="msg <?= $_SESSION['flash_status'] === 0 ? 'sucesso' : 'erro' ?>">
-                            <?= htmlspecialchars($_SESSION['flash_msg']) ?>
-                        </div>
-                        <?php 
-                            unset($_SESSION['flash_msg'], $_SESSION['flash_status']); 
-                        ?>
-                    <?php endif; ?>
+                    <?php
+                        exibir_mensagem();
+                    ?>
                 </form>
             </div>
         </div>
