@@ -16,8 +16,7 @@ if ($eh_edicao) {
         if ($result && mysqli_num_rows($result) > 0) {
             $tipo_atual = mysqli_fetch_assoc($result);
         } else {
-            $_SESSION['flash_msg'] = "Tipo não encontrado.";
-            $_SESSION['flash_status'] = -1;
+            definir_mensagem("Tipo não encontrado.", -1);
             header("Location: listar.php");
             exit;
         }
@@ -64,18 +63,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$result) {
             throw new Exception("Falha ao " . ($id_para_atualizar ? "atualizar" : "cadastrar") . " dados: " . mysqli_error($con_bd));
         }
-        
-        $_SESSION['flash_msg'] = $success_msg;
-        $_SESSION['flash_status'] = 0;
+
+        definir_mensagem($success_msg);
         
     } catch (Exception $e) {
-        $_SESSION['flash_msg'] = $e->getMessage();
-        $_SESSION['flash_status'] = -1;
+        definir_mensagem($e->getMessage(), -1);
     }
 
     if (isset($con_bd_err_code)) {
-        $_SESSION['flash_msg'] = "Erro com o banco de dados. Código: " . $con_bd_err_code;
-        $_SESSION['flash_status'] = -1;
+        definir_mensagem("Erro com o banco de dados. Código: " . $con_bd_err_code, -1);
     }
 
 

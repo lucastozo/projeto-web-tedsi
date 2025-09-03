@@ -1,3 +1,72 @@
+<?php declare(strict_types=1);
+session_start();
+require_once("../utils/mensagem.php");
+
+$id = null;
+$nome = null;
+$descricao = null;
+
+if (isset($_GET['id']) && isset($_GET['delete'])) {
+    deletar();
+}
+else if (isset($_GET['id'])) {
+    listar($id, $nome, $descricao);
+}
+
+function listar(&$id, &$nome, &$descricao) : bool {
+    $param_id = $_GET['id'];
+
+    require_once("../conf/con_bd.php");
+    
+    if (!isset($con_bd)) {
+        definir_mensagem("Erro de conexão com o banco de dados.", -1);
+        header("Location: listar.php");
+        exit;
+    }
+    
+    $sql = "SELECT * FROM habilidade WHERE id=$param_id;";
+    $result = mysqli_query($con_bd, $sql);
+
+    if (!$result) return false;
+    if (mysqli_num_rows($result) !== 1) return false;
+
+    $habilidade = mysqli_fetch_assoc($result);
+    $id = $habilidade['id'];
+    $nome = $habilidade['nome'];
+    $descricao = $habilidade['descricao'];
+    return true;
+}
+
+function deletar() {
+    $param_id = $_GET['id'];
+
+    require_once("../conf/con_bd.php");
+
+    if (!isset($con_bd)) {
+        definir_mensagem("Erro de conexão com o banco de dados.", -1);
+        header("Location: listar.php");
+        exit;
+    }
+
+    try {
+        $sql = "CALL deletar_habilidade('$param_id');";
+        $result = mysqli_query($con_bd, $sql);
+        
+        if (!$result) {
+            throw new Exception("Erro ao excluir habilidade: " . mysqli_error($con_bd));
+        }
+        
+        definir_mensagem("Habilidade excluída com sucesso.");
+
+    } catch (Exception $e) {
+        definir_mensagem($e->getMessage(), -1);
+    }
+
+    header("Location: listar.php");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,7 +107,26 @@
             </div>
         </nav>
         <div class="col-main">
-
+            <?php if ($id !== null && $nome !== null && $descricao !== null): ?>
+                <div>
+                    <h1>Detalhes da Habilidade</h1>
+                    <div>
+                        <p><strong>ID:</strong> <?= htmlspecialchars($id) ?></p>
+                        <p><strong>Nome:</strong> <?= htmlspecialchars($nome) ?></p>
+                        <p><strong>Descrição:</strong> <?= htmlspecialchars($descricao) ?></p>
+                    </div>
+                    <div>
+                        <a href="listar.php">Voltar para a lista</a>
+                        <a href="visualizar.php?id=<?=$id?>&delete">Excluir</a>
+                        <a href="cadastrar.php?id=<?=$id?>">Atualizar</a>
+                    </div>
+                </div>
+            <?php else: ?>
+                <div>
+                    <p>habilidade não encontrada ou ID inválido.</p>
+                    <a href="listar.php">Voltar para a lista</a>
+                </div>
+            <?php endif; ?>
         </div>
         <footer class="footer">
             <h3>Trabalho desenvolvido para a disciplina de Tópicos Especiais em Desenvolvimento de Sistemas I</h3>

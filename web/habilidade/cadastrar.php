@@ -1,9 +1,32 @@
 <?php declare(strict_types=1);
 session_start();
+require_once("../utils/mensagem.php");
+
+$eh_edicao = isset($_GET['id']) && !empty($_GET['id']);
+$id_habilidade = $eh_edicao ? (int)$_GET['id'] : null;
+$habilidade_atual = null;
+
+if ($eh_edicao) {
+    require_once("../conf/con_bd.php");
+    
+    if (isset($con_bd)) {
+        $sql = "SELECT * FROM habilidade WHERE id = $id_habilidade";
+        $result = mysqli_query($con_bd, $sql);
+        
+        if ($result && mysqli_num_rows($result) > 0) {
+            $habilidade_atual = mysqli_fetch_assoc($result);
+        } else {
+            definir_mensagem("Habilidade não encontrada.", -1);
+            header("Location: listar.php");
+            exit;
+        }
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = $_POST['nome'];
     $descricao = $_POST['descricao'];
+    $id_para_atualizar = isset($_POST['id']) ? (int)$_POST['id'] : null;
 
     function validar($nome, $descricao) : bool {
         if (!isset($nome) || !isset($descricao)) 
@@ -22,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     require_once("../conf/con_bd.php");
     $dados_validos = validar($nome, $descricao);
+
     try {
         if (!$dados_validos) {
             throw new Exception("Dados preenchidos inválidos.");
@@ -34,27 +58,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $nome = mysqli_real_escape_string($con_bd, $nome);
         $descricao = mysqli_real_escape_string($con_bd, $descricao);
 
-        $sql = "";
+        if ($id_para_atualizar) {
+            $sql = "CALL atualizar_habilidade($id_para_atualizar, '$nome', '$descricao');";
+            $success_msg = "Habilidade atualizada com sucesso.";
+        } else {
+            $sql = "CALL nova_habilidade('$nome', '$descricao');";
+            $success_msg = "Habilidade cadastrada com sucesso.";
+        }
+        
         $result = mysqli_query($con_bd, $sql);
         
         if (!$result) {
-            throw new Exception("Falha ao cadastrar dados: " . mysqli_error($con_bd));
+            throw new Exception("Falha ao " . ($id_para_atualizar ? "atualizar" : "cadastrar") . " dados: " . mysqli_error($con_bd));
         }
         
-        $_SESSION['flash_msg'] = "Dados cadastrados com sucesso.";
-        $_SESSION['flash_status'] = 0;
+        definir_mensagem($success_msg);
         
     } catch (Exception $e) {
-        $_SESSION['flash_msg'] = $e->getMessage();
-        $_SESSION['flash_status'] = -1;
+        definir_mensagem($e->getMessage(), -1);
     }
     
     if (isset($con_bd_err_code)) {
-        $_SESSION['flash_msg'] = "Erro com o banco de dados. Código: " . $con_bd_err_code;
-        $_SESSION['flash_status'] = -1;
+        definir_mensagem("Erro com o banco de dados. Código: " . $con_bd_err_code, -1);
     }
 
-    header("Location: " . $_SERVER['PHP_SELF']);
+    if ($id_para_atualizar) {
+        header("Location: listar.php");
+    } else {
+        header("Location: " . $_SERVER['PHP_SELF']);
+    }
     exit;
 }
 ?>
@@ -100,27 +132,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </nav>
         <div class="col-main">
             <div class="form">
-                <h1>Cadastrar Habilidade</h1>
+                <h1><?php echo $eh_edicao ? 'Atualizar' : 'Cadastrar'; ?> Habilidade</h1>
+
                 <form action="" method="POST">
+                    <?php if ($eh_edicao): ?>
+                        <input type="hidden" name="id" value="<?php echo $id_habilidade; ?>">
+                    <?php endif; ?>
+
                     <div id="div_nome" class="campo">
                         <label for="nome">Nome:</label>
-                        <input type="text" id="nome" name="nome" maxlength="30" required pattern="[a-zA-Z]*" placeholder="Overgrow"/>
+                        <input 
+                            type="text" 
+                            id="nome" 
+                            name="nome" 
+                            maxlength="30" 
+                            required 
+                            pattern="[a-zA-Z]*" 
+                            placeholder="Overgrow"
+                            value="<?php echo $habilidade_atual ? htmlspecialchars($habilidade_atual['nome']) : ''; ?>"
+                        />
                     </div>
                     <div id="div_descricao" class="campo">
                         <label for="descricao">Descrição:</label> <br> <!-- quebra linha -->
-                        <textarea id="descricao" name="descricao" required maxlength="255" rows="5" cols="30" placeholder="Powers up Grass-type moves when the Pokémon’s HP is low."></textarea>
+                        <textarea 
+                            id="descricao" 
+                            name="descricao" 
+                            required 
+                            maxlength="255" 
+                            rows="5" 
+                            cols="30" 
+                            placeholder="Powers up Grass-type moves when the Pokémon’s HP is low."
+                            ><?php echo $habilidade_atual ? htmlspecialchars($habilidade_atual['descricao']) : ''; ?></textarea>
                     </div>
                     <div id="div_enviar">
-                        <button type="submit">Cadastrar</button>
+                        <button type="submit">
+                            <?php echo $eh_edicao ? 'Atualizar' : 'Cadastrar'; ?>
+                        </button>
+                        <?php if ($eh_edicao): ?>
+                            <a href="listar.php">Cancelar</a>
+                        <?php endif; ?>
                     </div>
-                    <?php if (isset($_SESSION['flash_msg'])): ?>
-                        <div class="msg <?= $_SESSION['flash_status'] === 0 ? 'sucesso' : 'erro' ?>">
-                            <?= htmlspecialchars($_SESSION['flash_msg']) ?>
-                        </div>
-                        <?php 
-                            unset($_SESSION['flash_msg'], $_SESSION['flash_status']); 
-                        ?>
-                    <?php endif; ?>
+                    <?php
+                        exibir_mensagem();
+                    ?>
                 </form>
             </div>
         </div>
