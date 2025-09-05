@@ -24,7 +24,7 @@ if ($eh_edicao) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $imagem = $_POST['imagem'];
+    $imagem = $_FILES['imagem'];
     $nome = $_POST['nome'];
     $altura = $_POST['altura'];
     $peso = $_POST['peso'];
@@ -41,6 +41,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         {
             return false;
         }
+
+        if (!is_array($imagem)) return false;
+        if (!is_uploaded_file($imagem['tmp_name'])) return false;
 
         if (is_numeric($nome)) return false;
         if (mb_strlen($nome) > 50) return false;
@@ -74,8 +77,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Conexão com o banco de dados falhou.");
         }
 
-        $imagem = mysqli_real_escape_string($con_bd, $imagem);
         $nome = mysqli_real_escape_string($con_bd, $nome);
+
+        $ext_file = pathinfo($imagem['name'], PATHINFO_EXTENSION);
+        $path_img = "../img/pokemon/" . $nome . "." . $ext_file;
+
         $altura = mysqli_real_escape_string($con_bd, $altura);
         $peso = mysqli_real_escape_string($con_bd, $peso);
         $descricao = mysqli_real_escape_string($con_bd, $descricao);
@@ -96,6 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Falha ao " . ($id_para_atualizar ? "atualizar" : "cadastrar") . " dados: " . mysqli_error($con_bd));
         }
 
+        move_uploaded_file($imagem['tmp_name'], $path_img);
         definir_mensagem($success_msg);
     } catch (Exception $e) {
         definir_mensagem($e->getMessage(), -1);
@@ -157,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form">
                 <h1><?php echo $eh_edicao ? 'Atualizar' : 'Cadastrar'; ?> Pokémon</h1>
 
-                <form action="" method="POST">
+                <form action="" method="POST" enctype="multipart/form-data">
                     <?php if ($eh_edicao): ?>
                         <input type="hidden" name="id" value="<?php echo $id_pokemon; ?>">
                     <?php endif; ?>
