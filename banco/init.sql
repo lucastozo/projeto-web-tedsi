@@ -1,3 +1,7 @@
+DROP DATABASE IF EXISTS pokemon;
+CREATE DATABASE pokemon;
+USE pokemon;
+
 -- Create tables
 CREATE TABLE IF NOT EXISTS pokemon(
 id INTEGER AUTO_INCREMENT PRIMARY KEY,
@@ -126,6 +130,21 @@ SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Esse ID não foi encontrado.';
 END IF;
 DELETE FROM habilidade WHERE id = p_dlt_habilidade;
 END //
+
+-- CRUD pokemon
+
+CREATE PROCEDURE deletar_pokemon(
+IN p_dlt_pokemon INT
+)
+BEGIN
+DECLARE cnt_pokemon INT;
+SELECT COUNT(*) INTO cnt_pokemon FROM pokemon WHERE id = p_dlt_pokemon;
+IF cnt_pokemon = 0 THEN
+SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Esse ID não existe.';
+END IF;
+DELETE FROM pokemon WHERE id = p_dlt_pokemon;
+END //
+
 
 DELIMITER ;
 --Caso necessario
