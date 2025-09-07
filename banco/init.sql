@@ -8,20 +8,20 @@ CREATE TABLE IF NOT EXISTS pokemon (
     id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
     imagem VARCHAR(255) NOT NULL,
     nome VARCHAR(20) NOT NULL,
-    altura FLOAT(4,1) NOT NULL,
+    altura FLOAT(4,2) NOT NULL,
     peso FLOAT(5,2) NOT NULL,
     descricao VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS habilidade (
     id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    nome VARCHAR(30) NOT NULL,
+    nome VARCHAR(50) NOT NULL,
     descricao VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS tipo (
     id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    nome VARCHAR(30) NOT NULL
+    nome VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS tem_habilidade (
@@ -67,7 +67,7 @@ FROM pokemon p;
 DELIMITER //
 CREATE PROCEDURE insert_tipo
 (
-    IN p_nv_tipo VARCHAR(30)
+    IN p_nv_tipo VARCHAR(50)
 )
 BEGIN
     DECLARE cnt_tipo INT;
@@ -85,7 +85,7 @@ DELIMITER //
 CREATE PROCEDURE update_tipo
 (
     IN p_id INT,
-    IN p_nv_tipo VARCHAR(30)
+    IN p_nv_tipo VARCHAR(50)
 )
 BEGIN
     DECLARE cnt_tipo INT;
@@ -136,9 +136,9 @@ DELIMITER ;
 -- 3.2 HABILIDADE
 
 DELIMITER //
-CREATE PROCEDURE nova_habilidade
+CREATE PROCEDURE insert_habilidade
 (
-    IN p_nv_nome VARCHAR(30),
+    IN p_nv_nome VARCHAR(50),
     IN p_nv_descricao VARCHAR(255)
 )
 BEGIN
@@ -156,7 +156,7 @@ END //
 CREATE PROCEDURE update_habilidade
 (
     IN p_id INT,
-    IN p_nv_nome VARCHAR(30),
+    IN p_nv_nome VARCHAR(50),
     IN p_nv_descricao VARCHAR(255)
 )
 BEGIN
@@ -211,8 +211,8 @@ DELIMITER //
 CREATE PROCEDURE insert_pokemon
 (
     IN p_path_image VARCHAR(255),
-    IN p_nv_nome VARCHAR(30),
-    IN p_nv_altura FLOAT(4,1),
+    IN p_nv_nome VARCHAR(50),
+    IN p_nv_altura FLOAT(4,2),
     IN p_nv_peso FLOAT(5,2),
     IN p_nv_descricao VARCHAR(255),
     IN p_nv_tipo JSON,
@@ -270,8 +270,8 @@ CREATE PROCEDURE update_pokemon
 (
     IN p_id INT,
     IN p_nv_imagem VARCHAR(255),
-    IN p_nv_nome VARCHAR(30),
-    IN p_nv_altura FLOAT(4,1),
+    IN p_nv_nome VARCHAR(50),
+    IN p_nv_altura FLOAT(4,2),
     IN p_nv_peso FLOAT(5,2),
     IN p_nv_descricao VARCHAR(255),
     IN p_nv_tipo JSON,
