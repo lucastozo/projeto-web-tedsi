@@ -7,7 +7,7 @@ USE pokemon_tedsi;
 CREATE TABLE IF NOT EXISTS pokemon (
     id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
     imagem VARCHAR(255) NOT NULL,
-    nome VARCHAR(20) NOT NULL,
+    nome VARCHAR(50) NOT NULL,
     altura FLOAT(4,2) NOT NULL,
     peso FLOAT(5,2) NOT NULL,
     descricao VARCHAR(255) NOT NULL
