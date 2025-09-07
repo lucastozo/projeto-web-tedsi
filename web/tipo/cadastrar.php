@@ -51,10 +51,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $nome = mysqli_real_escape_string($con_bd, $nome);
         
         if ($id_para_atualizar) {
-            $sql = "CALL atualizar_tipo($id_para_atualizar, '$nome');";
+            $sql = "CALL update_tipo($id_para_atualizar, '$nome');";
             $success_msg = "Tipo atualizado com sucesso.";
         } else {
-            $sql = "CALL novo_tipo('$nome');";
+            $sql = "CALL insert_tipo('$nome');";
             $success_msg = "Tipo cadastrado com sucesso.";
         }
         

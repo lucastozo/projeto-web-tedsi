@@ -59,10 +59,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $descricao = mysqli_real_escape_string($con_bd, $descricao);
 
         if ($id_para_atualizar) {
-            $sql = "CALL atualizar_habilidade($id_para_atualizar, '$nome', '$descricao');";
+            $sql = "CALL update_habilidade($id_para_atualizar, '$nome', '$descricao');";
             $success_msg = "Habilidade atualizada com sucesso.";
         } else {
-            $sql = "CALL nova_habilidade('$nome', '$descricao');";
+            $sql = "CALL insert_habilidade('$nome', '$descricao');";
             $success_msg = "Habilidade cadastrada com sucesso.";
         }
         

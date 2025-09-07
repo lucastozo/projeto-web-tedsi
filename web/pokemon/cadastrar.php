@@ -10,7 +10,7 @@ if ($eh_edicao) {
     require_once("../conf/con_bd.php");
     
     if (isset($con_bd)) {
-        $sql = "SELECT * FROM VIEW QUE SERÁ FEITA AINDA WHERE id = $id_pokemon";
+        $sql = "SELECT * FROM vw_pokemon WHERE id = $id_pokemon";
         $result = mysqli_query($con_bd, $sql);
         
         if ($result && mysqli_num_rows($result) > 0) {
@@ -90,10 +90,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $habilidades = json_encode($habilidades, JSON_UNESCAPED_UNICODE);
 
         if ($id_para_atualizar) {
-            $sql = "CALL atualizar_pokemon($id_para_atualizar, '$imagem', '$nome', $altura, $peso, '$descricao', '$tipos', '$habilidades');";
+            $sql = "CALL update_pokemon($id_para_atualizar, '$imagem', '$nome', $altura, $peso, '$descricao', '$tipos', '$habilidades');";
             $success_msg = "Pokémon atualizado com sucesso.";
         } else {
-            $sql = "CALL novo_pokemon('$imagem', '$nome', $altura, $peso, '$descricao', '$tipos', '$habilidades');";
+            $sql = "CALL insert_pokemon('$imagem', '$nome', $altura, $peso, '$descricao', '$tipos', '$habilidades');";
             $success_msg = "Pokémon cadastrado com sucesso.";
         }
 

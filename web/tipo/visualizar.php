@@ -47,7 +47,7 @@ function deletar() {
     }
 
     try {
-        $sql = "CALL deletar_tipo('$param_id');";
+        $sql = "CALL delete_tipo('$param_id');";
         $result = mysqli_query($con_bd, $sql);
         
         if (!$result) {

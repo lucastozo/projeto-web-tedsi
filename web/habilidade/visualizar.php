@@ -49,7 +49,7 @@ function deletar() {
     }
 
     try {
-        $sql = "CALL deletar_habilidade('$param_id');";
+        $sql = "CALL delete_habilidade('$param_id');";
         $result = mysqli_query($con_bd, $sql);
         
         if (!$result) {
