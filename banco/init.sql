@@ -38,12 +38,22 @@ FOREIGN KEY (id_pokemon) REFERENCES pokemon(id));
 -- View
 
 CREATE VIEW vw_pokemon AS
-SELECT pokemon.*, tipo.nome AS tipo, habilidade.nome AS habilidade
-FROM pokemon 
-INNER JOIN tem_tipo ON tem_tipo.id_pokemon = pokemon.id
-LEFT JOIN tipo ON tipo.id = tem_tipo.id_tipo
-INNER JOIN tem_habilidade ON tem_habilidade.id_pokemon = pokemon.id
-LEFT JOIN habilidade ON habilidade.id = tem_habilidade.id_habilidade;
+SELECT p.id, p.imagem, p.nome, p.altura, p.peso, p.descricao,
+    (
+        SELECT JSON_ARRAYAGG(t.nome)
+        FROM tem_tipo tt
+        JOIN tipo t ON t.id = tt.id_tipo
+        WHERE tt.id_pokemon = p.id
+        ORDER BY t.nome
+    ) AS tipos,
+    (
+        SELECT JSON_ARRAYAGG(h.nome)
+        FROM tem_habilidade th
+        JOIN habilidade h ON h.id = th.id_habilidade
+        WHERE th.id_pokemon = p.id
+        ORDER BY h.nome
+    ) AS habilidades
+FROM pokemon p;
 
 -- Procedures
 
