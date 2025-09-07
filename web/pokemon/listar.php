@@ -62,7 +62,7 @@ require_once("../utils/mensagem.php");
                     require_once("../conf/con_bd.php");
 
                     if (isset($con_bd)) {
-                        $sql = "SELECT * FROM pokemon ORDER BY id";
+                        $sql = "SELECT * FROM vw_pokemon ORDER BY id";
                         $result = mysqli_query($con_bd, $sql);
                         
                         if ($result) 
@@ -77,8 +77,24 @@ require_once("../utils/mensagem.php");
                                     echo "<td>" . htmlspecialchars($pokemon['altura']) . "</td>";
                                     echo "<td>" . htmlspecialchars($pokemon['peso']) . "</td>";
                                     echo "<td>" . htmlspecialchars($pokemon['descricao']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($pokemon['tipos']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($pokemon['habilidades']) . "</td>";
+
+                                    $tipos = json_decode($pokemon['tipos'], true);
+                                    $habilidades = json_decode($pokemon['habilidades'], true);
+                                    
+                                    echo "<td><ul>";
+                                    foreach ($tipos as $tipo) 
+                                    {
+                                        echo "<li>" . htmlspecialchars($tipo) . "</li>";
+                                    }
+                                    echo "</ul></td>";
+
+                                    echo "<td><ul>";
+                                    foreach ($habilidades as $habilidade) 
+                                    {
+                                        echo "<li>" . htmlspecialchars($habilidade) . "</li>";
+                                    }
+                                    echo "</ul></td>";
+
                                     echo "<td>";
                                     echo "<a href='visualizar.php?id=" . $pokemon['id'] . "'>Visualizar</a>";
                                     echo "</td>";
