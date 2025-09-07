@@ -80,7 +80,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $nome = mysqli_real_escape_string($con_bd, $nome);
 
         $ext_file = pathinfo($imagem['name'], PATHINFO_EXTENSION);
-        $path_img = "../img/pokemon/" . $nome . "." . $ext_file;
+        $path_dir = "../img/pokemon/";
+        $path_img = $path_dir . $nome . "." . $ext_file;
 
         $altura = mysqli_real_escape_string($con_bd, $altura);
         $peso = mysqli_real_escape_string($con_bd, $peso);
@@ -101,8 +102,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$result) {
             throw new Exception("Falha ao " . ($id_para_atualizar ? "atualizar" : "cadastrar") . " dados: " . mysqli_error($con_bd));
         }
+        
+        if (!is_dir($path_dir)) {
+            mkdir($path_dir, 0777, true);
+        }
 
         move_uploaded_file($imagem['tmp_name'], $path_img);
+
         definir_mensagem($success_msg);
     } catch (Exception $e) {
         definir_mensagem($e->getMessage(), -1);
