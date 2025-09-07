@@ -3,6 +3,7 @@ CREATE DATABASE pokemon;
 USE pokemon;
 
 -- Create tables
+
 CREATE TABLE IF NOT EXISTS pokemon(
 id INTEGER AUTO_INCREMENT PRIMARY KEY,
 imagem VARCHAR(255),
@@ -34,10 +35,22 @@ id_pokemon INTEGER,
 FOREIGN KEY (id_tipo) REFERENCES tipo(id),
 FOREIGN KEY (id_pokemon) REFERENCES pokemon(id));
 
+-- View
+
+CREATE VIEW vw_pokemon AS
+SELECT pokemon.*, tipo.nome AS tipo, habilidade.nome AS habilidade
+FROM pokemon 
+INNER JOIN tem_tipo ON tem_tipo.id_pokemon = pokemon.id
+LEFT JOIN tipo ON tipo.id = tem_tipo.id_tipo
+INNER JOIN tem_habilidade ON tem_habilidade.id_pokemon = pokemon.id
+LEFT JOIN habilidade ON habilidade.id = tem_habilidade.id_habilidade;
+
 -- Procedures
+
 DELIMITER //
 
 -- CRUD tipo
+
 CREATE PROCEDURE novo_tipo(
 IN p_nv_tipo VARCHAR(30)
 )
@@ -229,6 +242,7 @@ END //
 
 DELIMITER ;
 --Caso necessario
+
 DROP PROCEDURE novo_tipo;
 DROP PROCEDURE atualizar_tipo;
 DROP PROCEDURE deletar_tipo;
@@ -240,6 +254,3 @@ DROP PROCEDURE deletar_habilidade;
 DROP PROCEDURE novo_pokemon;
 DROP PROCEDURE atualizar_pokemon;
 DROP PROCEDURE deletar_pokemon;
-
-CALL novo_pokemon('a', 'aaaaaabab', 1.0, 2.0, 'a', '["1", "2"]', '["2"]');
-CALL atualizar_pokemon(2, './var/etc/', 'alecrim', 1.5, 300.0, 'abcd');
