@@ -209,10 +209,13 @@ IN p_nv_imagem VARCHAR(255),
 IN p_nv_nome VARCHAR(30),
 IN p_nv_altura FLOAT(4,1),
 IN p_nv_peso FLOAT(5,2),
-IN p_nv_descricao VARCHAR(255)
+IN p_nv_descricao VARCHAR(255),
+IN p_nv_tipo JSON,
+IN p_nv_habilidade JSON
 )
 BEGIN
 DECLARE cnt_pokemon INT;
+DECLARE i INT DEFAULT 0;
 SELECT COUNT(*) INTO cnt_pokemon FROM pokemon WHERE id = p_id;
 IF cnt_pokemon = 0 THEN
 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Não existe um pokemon com esse id.';
@@ -223,6 +226,27 @@ IF cnt_pokemon > 0 THEN
 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Já existe um pokemon com esse nome.';
 END IF;
 UPDATE pokemon SET imagem = p_nv_imagem, nome = p_nv_nome, altura = p_nv_altura, peso = p_nv_peso, descricao = p_nv_descricao WHERE id = p_id;
+DELETE FROM tem_tipo WHERE id_pokemon = p_id;
+DELETE FROM tem_habilidade WHERE id_pokemon = p_id;
+WHILE i < JSON_LENGTH(p_nv_tipo) DO
+SELECT COUNT(*) INTO cnt_pokemon FROM tipo WHERE id = JSON_UNQUOTE(JSON_EXTRACT(p_nv_tipo, CONCAT('$[',i,']')));
+IF cnt_pokemon = 0 THEN
+SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Esse id tipo não existe.';
+END IF;
+INSERT INTO tem_tipo(id_pokemon, id_tipo) VALUES (p_id, JSON_EXTRACT(p_nv_tipo, CONCAT('$[',i,']')));
+SET i = i + 1;
+SET cnt_pokemon = 0;
+END WHILE;
+SET i = 0;
+WHILE i < JSON_LENGTH(p_nv_habilidade) DO
+SELECT COUNT(*) INTO cnt_pokemon FROM habilidade WHERE id = JSON_UNQUOTE(JSON_EXTRACT(p_nv_habilidade, CONCAT('$[',i,']')));
+IF cnt_pokemon = 0 THEN
+SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Esse id habilidade não existe.';
+END IF;
+INSERT INTO tem_habilidade(id_pokemon, id_habilidade) VALUES (p_id, JSON_EXTRACT(p_nv_habilidade, CONCAT('$[',i,']')));
+SET i = i + 1;
+SET cnt_pokemon = 0;
+END WHILE;
 END //
 
 CREATE PROCEDURE deletar_pokemon(
