@@ -2,7 +2,7 @@
 
 body {
     margin: 0;
-    font-family: cursive;
+    font-family: arial, helvetica, sans-serif;
 }
 
 div.container {
@@ -27,11 +27,14 @@ div.container header {
     border-color: rgb(34, 34, 36);
     grid-column-start: 1;
     grid-column-end: 3;
+    color: rgb(255, 203, 5);
+    text-shadow: 2px 2px rgb(52, 102, 175);
 }
 
 div.container nav.col-nav {
-    background-image: url("https://i.pinimg.com/736x/fc/5f/94/fc5f945315c04990ca398829d10aa86e.jpg");
+    background-image: url("greatball.jpg");
     background-position: center;
+    background-repeat: no-repeat;
     background-size: 158%;
     grid-row-start: 2;
     grid-row-end: 3;
@@ -50,7 +53,7 @@ div.container nav.col-nav div p {
     font-size: larger;
     margin: 0;
     color: rgb(255, 203, 5);
-    text-shadow: 2px 2px rgb(52, 102, 175);
+    text-shadow: 2px 1px rgb(52, 102, 175);
 }
 
 div.container nav.col-nav div a {
@@ -64,7 +67,8 @@ div.container nav.col-nav div a:hover {
 }
 
 div.container div.col-main {
-    background-image: url("https://static.vecteezy.com/system/resources/thumbnails/029/167/297/small_2x/pokemon-logo-design-free-vector.jpg");
+    background-image: url("logo.jpg");
+    background-size: 75%;
     background-repeat: no-repeat;
     background-position: center;
     display: flex;
@@ -154,6 +158,7 @@ table th, table td {
 }
 
 table tr:nth-child(even){background-color: #f2f2f2;}
+table tr:nth-child(odd){background-color: #b7b5b5}
 
 table tr:hover {background-color: #ddd;}
 
@@ -166,7 +171,7 @@ table th {
 }
 
 .btn {
-    background-color: #555555;
+    background-color: #020b05;
     border: none;
     border-radius: 5px;
     color: white;
