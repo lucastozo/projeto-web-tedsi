@@ -247,8 +247,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             if (isset($con_bd)) {
                                 $sql = "SELECT id, nome FROM tipo";
                                 $result = mysqli_query($con_bd, $sql);
-                                while ($tipos = mysqli_fetch_assoc($result)) {
-                                    echo "<option value='{$tipos['id']}'>{$tipos['nome']}</option>";
+                                while ($tipos = mysqli_fetch_assoc($result)) 
+                                {
+                                    $tipo_select = '';
+                                    if ($pokemon_atual) {
+                                        $tipos_arr = json_decode($pokemon_atual['tipos'], true);
+                                        if (in_array(htmlspecialchars($tipos['nome']), $tipos_arr)) {
+                                            $tipo_select = "selected";
+                                        }
+                                    }
+
+                                    echo "<option " . $tipo_select . " value='{$tipos['id']}'>{$tipos['nome']}</option>";
                                 }
                             }
                             ?>
@@ -262,8 +271,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             if (isset($con_bd)) {
                                 $sql = "SELECT id, nome FROM habilidade";
                                 $result = mysqli_query($con_bd, $sql);
-                                while ($habilidades = mysqli_fetch_assoc($result)) {
-                                    echo "<option value='{$habilidades['id']}'>{$habilidades['nome']}</option>";
+                                while ($habilidades = mysqli_fetch_assoc($result)) 
+                                {
+                                    $habilidade_select = '';
+                                    if ($pokemon_atual) {
+                                        $habilidades_arr = json_decode($pokemon_atual['habilidades'], true);
+                                        if (in_array(htmlspecialchars($habilidades['nome']), $habilidades_arr)) {
+                                            $habilidade_select = "selected";
+                                        }
+                                    }
+
+                                    echo "<option " . $habilidade_select . " value='{$habilidades['id']}'>{$habilidades['nome']}</option>";
                                 }
                             }
                             ?>
