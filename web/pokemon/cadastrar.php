@@ -33,17 +33,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $habilidades = $_POST['habilidades'];
     $id_para_atualizar = isset($_POST['id']) ? (int)$_POST['id'] : null;
 
-    function validar($imagem, $nome, $altura, $peso, $descricao, $tipos, $habilidades) : bool {
+    function validar($imagem, $nome, $altura, $peso, $descricao, $tipos, $habilidades, $edicao) : bool {
+        if (!$edicao && !isset($imagem)) return false;
+
         if (
-            !isset($imagem) || !isset($nome) || !isset($altura) || !isset($peso) || 
+            !isset($nome) || !isset($altura) || !isset($peso) || 
             !isset($descricao) || !isset($tipos) || !isset($habilidades)
             ) 
         {
             return false;
         }
 
-        if (!is_array($imagem)) return false;
-        if (!is_uploaded_file($imagem['tmp_name'])) return false;
+        if (!$edicao) {
+            if (!is_array($imagem)) return false;
+            if (!is_uploaded_file($imagem['tmp_name'])) return false;
+        }
 
         if (is_numeric($nome)) return false;
         if (mb_strlen($nome) > 50) return false;
@@ -66,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     require_once("../conf/con_bd.php");
-    $dados_validos = validar($imagem, $nome, $altura, $peso, $descricao, $tipos, $habilidades);
+    $dados_validos = validar($imagem, $nome, $altura, $peso, $descricao, $tipos, $habilidades, $id_para_atualizar !== null);
 
     try {
         if (!$dados_validos) {
@@ -83,6 +87,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $path_dir = "../img/pokemon/";
         $path_img = $path_dir . $nome . "." . $ext_file;
 
+        if ($id_para_atualizar) {
+            if ($imagem['error'] === UPLOAD_ERR_NO_FILE) {
+                $ext_file = pathinfo($pokemon_atual["imagem"], PATHINFO_EXTENSION);
+                $novo_caminho = $path_dir . $nome . "." . $ext_file;
+                rename($pokemon_atual["imagem"], $novo_caminho);
+                $path_img = $novo_caminho;
+            }
+            else {
+                // isso é pra remover a foto antiga, já que o nome do pokemon vai ser alterado e a 
+                // lógica para inserção é a mesma
+                unlink($pokemon_atual["imagem"]);
+            }
+        }
+
         $altura = mysqli_real_escape_string($con_bd, $altura);
         $peso = mysqli_real_escape_string($con_bd, $peso);
         $descricao = mysqli_real_escape_string($con_bd, $descricao);
@@ -90,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $habilidades = json_encode($habilidades, JSON_UNESCAPED_UNICODE);
 
         if ($id_para_atualizar) {
-            $sql = "CALL update_pokemon($id_para_atualizar, '$imagem', '$nome', $altura, $peso, '$descricao', '$tipos', '$habilidades');";
+            $sql = "CALL update_pokemon($id_para_atualizar, '$path_img', '$nome', $altura, $peso, '$descricao', '$tipos', '$habilidades');";
             $success_msg = "Pokémon atualizado com sucesso.";
         } else {
             $sql = "CALL insert_pokemon('$path_img', '$nome', $altura, $peso, '$descricao', '$tipos', '$habilidades');";
@@ -181,9 +199,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             type="file" 
                             id="imagem" 
                             name="imagem" 
-                            required 
+                            <?php echo $pokemon_atual ? '' : "required"; ?>
                             accept=".png,.jpg,.jpeg"
-                            value="<?php echo $pokemon_atual ? htmlspecialchars($pokemon_atual['imagem']) : ''; ?>"
                         />
                     </div>
                     <div id="div_nome" class="campo">
