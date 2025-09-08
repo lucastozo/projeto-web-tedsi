@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sql = "CALL update_pokemon($id_para_atualizar, '$imagem', '$nome', $altura, $peso, '$descricao', '$tipos', '$habilidades');";
             $success_msg = "Pokémon atualizado com sucesso.";
         } else {
-            $sql = "CALL insert_pokemon('$imagem', '$nome', $altura, $peso, '$descricao', '$tipos', '$habilidades');";
+            $sql = "CALL insert_pokemon('$path_img', '$nome', $altura, $peso, '$descricao', '$tipos', '$habilidades');";
             $success_msg = "Pokémon cadastrado com sucesso.";
         }
 
