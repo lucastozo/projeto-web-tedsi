@@ -70,6 +70,7 @@ div.container div.col-main div.form, div.container div.col-main div.card {
     padding: 50px;
     margin: 10px;
     width: 50%;
+    max-width: 800px;
     box-sizing: border-box;
     transform: translateX(-100px); /* isso é pra compensar o tamanho da grid. Pra tentar deixar o form no centro da tela (gambiarra) */
 }
@@ -109,6 +110,10 @@ form div button {
     cursor: pointer;
 }
 
+.card div p {
+    word-wrap: break-word;
+}
+
 .msg {
     padding: 10px;
     margin-top: 15px;
@@ -139,6 +144,9 @@ table th, table td {
     padding: 12px 15px;
     border: 1px solid black;
     text-align: left;
+
+    word-wrap: break-word;
+    max-width: 150px;
 }
 
 table tr:nth-child(even){background-color: #f2f2f2;}
