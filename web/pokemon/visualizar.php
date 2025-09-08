@@ -59,13 +59,24 @@ function deletar() {
     }
 
     try {
+        $sql = "SELECT imagem FROM vw_pokemon WHERE id=$param_id;";
+        $result = mysqli_query($con_bd, $sql);
+
+        if (!$result || mysqli_num_rows($result) !== 1) {
+            throw new Exception("Erro ao excluir Pokémon: " . mysqli_error($con_bd));
+        }
+
+        $pokemon = mysqli_fetch_assoc($result);
+
+        unlink($pokemon['imagem']);
+
         $sql = "CALL delete_pokemon('$param_id');";
         $result = mysqli_query($con_bd, $sql);
         
         if (!$result) {
             throw new Exception("Erro ao excluir Pokémon: " . mysqli_error($con_bd));
         }
-        
+
         definir_mensagem("Pokémon excluído com sucesso.");
 
     } catch (Exception $e) {
