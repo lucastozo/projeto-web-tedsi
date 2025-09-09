@@ -38,7 +38,37 @@
             </div>
         </nav>
         <div class="col-main">
-
+            <?php
+                session_start();
+                require_once("conf/con_bd.php");
+                if (isset($con_bd)) {
+                    $sql = "SELECT id, imagem, nome FROM pokemon ORDER BY rand()";
+                    $result = mysqli_query($con_bd, $sql);
+                    if ($result && mysqli_num_rows($result) > 0) {
+                        ?>
+                        <div class="cards">
+                        <?php
+                        define("LIMITE_CARDS_QTD", 4);
+                        $i = 0;
+                        while (($pokemon = mysqli_fetch_assoc($result)) && $i < LIMITE_CARDS_QTD) {
+                            // Tirar o "../" do path
+                            $path_img = substr($pokemon['imagem'], 3);
+                            ?>
+                            <div class="pokemon-card">
+                                <img src="<?=$path_img?>" alt="<?=$pokemon['nome']?>">
+                                <div class="info">
+                                    <a href="pokemon/visualizar.php?id=<?=$pokemon['id']?>"><?=$pokemon['nome']?></a>
+                                </div>
+                            </div>
+                            <?php
+                            $i++;
+                        }
+                        ?>
+                        </div>
+                        <?php
+                    }
+                }
+            ?>
         </div>
         <footer class="footer">
             <h3>Trabalho desenvolvido para a disciplina de Tópicos Especiais em Desenvolvimento de Sistemas I</h3>
